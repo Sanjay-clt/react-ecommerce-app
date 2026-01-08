@@ -1,9 +1,20 @@
 import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
+
 import ProductPage from "./ProductPage";
 import CartPage from "./CartPage";
 import WishlistPage from "./WishlistPage";
 import OrderPage from "./OrderPage";
+
+// Auth pages
+import Login from "./Login";
+import Signup from "./Signup";
+import ForgotPassword from "./ForgotPassword";
+import VerifyOtp from "./VerifyOtp";
+import ResetPassword from "./ResetPassword";
+
+// Protected Route
+import ProtectedRoute from "./ProtectedRoute";
 
 function App() {
   const [cart, setCart] = useState([]);
@@ -11,28 +22,53 @@ function App() {
 
   return (
     <Routes>
+      {/* ========== AUTH ROUTES (PUBLIC) ========== */}
+      <Route path="/" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/verify-otp" element={<VerifyOtp />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
+      {/* ========== SHOP ROUTES (PROTECTED) ========== */}
       <Route
-        path="/"
+        path="/products"
         element={
-          <ProductPage
-            cart={cart}
-            setCart={setCart}
-            wishlist={wishlist}
-            setWishlist={setWishlist}
-          />
+          <ProtectedRoute>
+            <ProductPage
+              cart={cart}
+              setCart={setCart}
+              wishlist={wishlist}
+              setWishlist={setWishlist}
+            />
+          </ProtectedRoute>
         }
       />
+
       <Route
         path="/cart"
-        element={<CartPage cart={cart} />}
+        element={
+          <ProtectedRoute>
+            <CartPage cart={cart} />
+          </ProtectedRoute>
+        }
       />
+
       <Route
         path="/wishlist"
-        element={<WishlistPage wishlist={wishlist} />}
+        element={
+          <ProtectedRoute>
+            <WishlistPage wishlist={wishlist} />
+          </ProtectedRoute>
+        }
       />
+
       <Route
         path="/order"
-        element={<OrderPage />}
+        element={
+          <ProtectedRoute>
+            <OrderPage />
+          </ProtectedRoute>
+        }
       />
     </Routes>
   );
