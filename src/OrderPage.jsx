@@ -2,42 +2,21 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./OrderPage.css";
 
-function OrderPage() {
+function OrderPage({ setNotifications }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 🟢 FROM BUY NOW
-  const singleProduct = location.state?.product;
+  const product = location.state?.product;
+  const cartItems = location.state?.cartItems || [];
 
-  // 🟢 FROM CART
-  const cartItems = location.state?.cartItems;
+  const initialItems = product
+    ? [{ ...product, quantity: 1 }]
+    : cartItems.map(item => ({ ...item, quantity: 1 }));
 
-  // Decide order items
-  const initialItems = singleProduct
-    ? [{ ...singleProduct, quantity: 1 }]
-    : (cartItems || []).map(item => ({ ...item, quantity: 1 }));
+  // ✅ FIX: remove unused setter
+  const [orderItems] = useState(initialItems);
 
-  // 🔥 Quantity state
-  const [orderItems, setOrderItems] = useState(initialItems);
-
-  // ➕ Increase quantity
-  const increaseQty = (index) => {
-    const updated = [...orderItems];
-    updated[index].quantity += 1;
-    setOrderItems(updated);
-  };
-
-  // ➖ Decrease quantity
-  const decreaseQty = (index) => {
-    const updated = [...orderItems];
-    if (updated[index].quantity > 1) {
-      updated[index].quantity -= 1;
-      setOrderItems(updated);
-    }
-  };
-
-  // 💰 Grand total
-  const grandTotal = orderItems.reduce(
+  const total = orderItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
@@ -46,39 +25,27 @@ function OrderPage() {
     <div className="order-container">
       <h2>Order Summary</h2>
 
-      {orderItems.length === 0 ? (
-        <p>No items to order ❌</p>
-      ) : (
-        <>
-          {orderItems.map((item, index) => (
-            <div className="order-card" key={index}>
-              <h4>{item.name}</h4>
-              <p>Price: ₹{item.price}</p>
+      {orderItems.map((item, index) => (
+        <div key={index}>
+          <h4>{item.name}</h4>
+          <p>₹{item.price}</p>
+        </div>
+      ))}
 
-              {/* ✅ Quantity buttons */}
-              <div className="qty-box">
-                <button onClick={() => decreaseQty(index)}>-</button>
-                <span>{item.quantity}</span>
-                <button onClick={() => increaseQty(index)}>+</button>
-              </div>
+      <h3>Grand Total: ₹{total}</h3>
 
-              <p>Total: ₹{item.price * item.quantity}</p>
-            </div>
-          ))}
-
-          <h3>Grand Total: ₹{grandTotal}</h3>
-
-          <button
-            className="confirm-btn"
-            onClick={() => {
-              alert("Order placed successfully 🎉");
-              navigate("/");
-            }}
-          >
-            Confirm Order
-          </button>
-        </>
-      )}
+      <button
+        onClick={() => {
+          setNotifications(prev => [
+            ...prev,
+            { message: "Order placed successfully" }
+          ]);
+          alert("Order placed successfully 🎉");
+          navigate("/");
+        }}
+      >
+        Confirm Order
+      </button>
     </div>
   );
 }

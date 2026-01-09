@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./ProductPage.css";
 
-function ProductPage({ cart, setCart, wishlist, setWishlist }) {
+function ProductPage({ cart, setCart, wishlist, setWishlist, setNotifications }) {
   const navigate = useNavigate();
 
   const products = [
@@ -14,14 +14,12 @@ function ProductPage({ cart, setCart, wishlist, setWishlist }) {
     { id: 6, name: "Product 6", price: 1599 },
   ];
 
-  // ✅ ADD TO CART (STATE + LOCAL STORAGE)
   const addToCart = (product) => {
     let updatedCart;
+    const exists = cart.find(item => item.id === product.id);
 
-    const existing = cart.find((item) => item.id === product.id);
-
-    if (existing) {
-      updatedCart = cart.map((item) =>
+    if (exists) {
+      updatedCart = cart.map(item =>
         item.id === product.id
           ? { ...item, quantity: item.quantity + 1 }
           : item
@@ -31,79 +29,60 @@ function ProductPage({ cart, setCart, wishlist, setWishlist }) {
     }
 
     setCart(updatedCart);
-
-    // ✅ SAVE TO LOCAL STORAGE (THIS WAS MISSING)
     localStorage.setItem("cart", JSON.stringify(updatedCart));
 
-    alert("Product added to cart ✅");
+    setNotifications(prev => [
+      ...prev,
+      { message: `${product.name} added to cart` }
+    ]);
   };
 
-  // ✅ ADD TO WISHLIST
   const addToWishlist = (product) => {
-    const exists = wishlist.find((item) => item.id === product.id);
-
-    if (exists) {
-      alert("Product already in wishlist ❤️");
-      return;
-    }
+    const exists = wishlist.find(item => item.id === product.id);
+    if (exists) return;
 
     setWishlist([...wishlist, product]);
-    alert("Product added to wishlist ❤️");
+
+    setNotifications(prev => [
+      ...prev,
+      { message: `${product.name} added to wishlist` }
+    ]);
   };
 
-  // ✅ BUY NOW → ORDER PAGE (SINGLE PRODUCT)
   const buyNow = (product) => {
     navigate("/order", {
-      state: {
-        product: { ...product, quantity: 1 },
-      },
+      state: { product }
     });
   };
 
   return (
     <div className="container">
-      {/* HEADER */}
       <div className="header">
         <h2>Online Shopping Website</h2>
 
         <div className="top-buttons">
-          <button className="nav-btn" onClick={() => navigate("/cart")}>
+          <button onClick={() => navigate("/cart")}>
             🛒 Cart ({cart.length})
           </button>
 
-          <button className="nav-btn" onClick={() => navigate("/wishlist")}>
+          <button onClick={() => navigate("/wishlist")}>
             ❤️ Wishlist ({wishlist.length})
           </button>
         </div>
       </div>
 
-      {/* PRODUCTS */}
       <div className="product-grid">
-        {products.map((product) => (
+        {products.map(product => (
           <div className="card" key={product.id}>
             <h3>{product.name}</h3>
             <p>₹{product.price}</p>
 
             <div className="icons">
-              <button
-                className="icon-btn"
-                onClick={() => addToCart(product)}
-              >
-                🛒
-              </button>
-
-              <button
-                className="icon-btn"
-                onClick={() => addToWishlist(product)}
-              >
-                ❤️
-              </button>
+              <button onClick={() => addToCart(product)}>🛒</button>
+              <button onClick={() => addToWishlist(product)}>❤️</button>
             </div>
 
-            <button
-              className="buy-btn"
-              onClick={() => buyNow(product)}
-            >
+            <button className="buy-btn" onClick={() => buyNow(product)}>
               Buy Now
             </button>
           </div>
