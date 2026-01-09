@@ -7,11 +7,12 @@ import WishlistPage from "./WishlistPage";
 import OrderPage from "./OrderPage";
 
 // Auth pages
-import Login from "./Login";
-import Signup from "./Signup";
-import ForgotPassword from "./ForgotPassword";
-import VerifyOtp from "./VerifyOtp";
-import ResetPassword from "./ResetPassword";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import VerifyOtp from "./pages/VerifyOtp";
+import ResetPassword from "./pages/ResetPassword";
+
 
 // Protected Route
 import ProtectedRoute from "./ProtectedRoute";
